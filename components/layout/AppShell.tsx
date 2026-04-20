@@ -24,7 +24,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-bg text-text flex flex-col">
       <FullScreenMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
 
-      <header className="fixed top-0 left-0 w-full h-24 px-6 md:px-12 bg-transparent z-[50] flex items-center justify-between mix-blend-difference pointer-events-none">
+      <header className="hidden md:flex fixed top-0 left-0 w-full h-24 px-6 md:px-12 bg-transparent z-[50] items-center justify-between mix-blend-difference pointer-events-none">
         <Link href="/" className="pointer-events-auto">
           <h1 className="font-serif text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">BRIDGR</h1>
         </Link>
@@ -40,7 +40,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1 pt-24 md:pt-32 pb-24 md:pb-12 px-4 md:px-6 lg:px-12 max-w-7xl mx-auto w-full z-10">
+      <main className="flex-1 pt-6 md:pt-32 pb-24 md:pb-12 px-4 md:px-6 lg:px-12 max-w-7xl mx-auto w-full z-10">
         {children}
       </main>
 
