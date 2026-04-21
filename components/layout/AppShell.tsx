@@ -8,17 +8,22 @@ import Link from "next/link";
 import { Bell, Home, Map as MapIcon, Swords, Trophy, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import { useMockData } from "@/lib/MockDataContext";
+
 const NAV_ITEMS = [
   { href: "/", label: "Lobby", icon: Home },
   { href: "/map", label: "Hub", icon: MapIcon },
   { href: "/quests", label: "Quests", icon: Swords },
   { href: "/leaderboard", label: "Rank", icon: Trophy },
-  { href: "/profile", label: "Chamber", icon: User },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { currentUser } = useMockData();
+
+  // Dynamically attach the profile link to the current user
+  const _navItems = [...NAV_ITEMS, { href: `/profile/${currentUser.username}`, label: "Chamber", icon: User }];
 
   return (
     <div className="min-h-screen bg-bg text-text flex flex-col">
@@ -29,7 +34,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <h1 className="font-serif text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">BRIDGR</h1>
         </Link>
         <div className="flex items-center gap-4 md:gap-6 pointer-events-auto">
-          <KarmaCounter karma={142} />
+          <KarmaCounter karma={currentUser.karma} />
           <button 
              onClick={() => setMenuOpen(true)}
              className="hidden md:flex group flex-col gap-2 p-3 hover:bg-white/10 rounded-full transition-colors cursor-pointer"
@@ -49,7 +54,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         className="md:hidden fixed bottom-0 left-0 w-full bg-card/95 backdrop-blur-md border-t border-white/5 py-3 pb-[calc(env(safe-area-inset-bottom)+12px)] px-2 z-[999]"
       >
         <div className="flex items-center justify-around max-w-md mx-auto">
-          {NAV_ITEMS.map((item) => {
+          {_navItems.map((item) => {
              const isActive = pathname === item.href;
              return (
                <a

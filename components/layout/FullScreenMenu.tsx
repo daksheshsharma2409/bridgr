@@ -5,19 +5,22 @@ import gsap from "gsap";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X, Home, Map as MapIcon, Swords, Trophy, User } from "lucide-react";
+import { useMockData } from "@/lib/MockDataContext";
 
-const NAV_ITEMS = [
+const BASE_NAV_ITEMS = [
   { href: "/", label: "Lobby", icon: Home, highlightClass: "text-primary", bgClass: "bg-primary" },
   { href: "/map", label: "Spatial Hub", icon: MapIcon, highlightClass: "text-online", bgClass: "bg-online" },
   { href: "/quests", label: "Quests", icon: Swords, highlightClass: "text-quest", bgClass: "bg-quest" },
   { href: "/leaderboard", label: "Hall of Nerds", icon: Trophy, highlightClass: "text-karma", bgClass: "bg-karma" },
-  { href: "/profile", label: "Chamber", icon: User, highlightClass: "text-alert", bgClass: "bg-alert" },
 ];
 
 export function FullScreenMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const container = useRef<HTMLDivElement>(null);
   const tl = useRef<gsap.core.Timeline | null>(null);
   const pathname = usePathname();
+  const { currentUser } = useMockData();
+
+  const NAV_ITEMS = [...BASE_NAV_ITEMS, { href: `/profile/${currentUser.username}`, label: "Chamber", icon: User, highlightClass: "text-alert", bgClass: "bg-alert" }];
 
   useEffect(() => {
     tl.current = gsap.timeline({ paused: true });
@@ -74,9 +77,9 @@ export function FullScreenMenu({ isOpen, onClose }: { isOpen: boolean; onClose: 
 
       <button 
         onClick={onClose}
-        className="absolute top-8 right-8 w-14 h-14 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors z-[101]"
+        className="absolute top-8 right-8 w-14 h-14 flex items-center justify-center rounded-full bg-card/50 hover:bg-card border border-border-subtle transition-colors z-[101]"
       >
-        <X className="w-8 h-8 text-white" />
+        <X className="w-8 h-8 text-text" />
       </button>
 
       <div className="flex flex-col gap-6 md:gap-8 items-start w-full relative z-10 w-max">
@@ -89,10 +92,10 @@ export function FullScreenMenu({ isOpen, onClose }: { isOpen: boolean; onClose: 
               onClick={onClose}
               className="menu-item-wrap group flex items-center gap-6 md:gap-8 cursor-pointer"
             >
-              <div className={`p-4 md:p-5 rounded-2xl bg-white/5 border border-white/10 transition-all duration-300 group-hover:${item.bgClass} group-hover:text-black shadow-lg`}>
-                 <item.icon className={`w-8 h-8 md:w-12 md:h-12 ${isActive ? item.highlightClass : "text-white"} transition-colors group-hover:text-black`} />
+              <div className={`p-4 md:p-5 rounded-2xl bg-card border border-border-subtle transition-all duration-300 group-hover:${item.bgClass} group-hover:text-black shadow-lg`}>
+                 <item.icon className={`w-8 h-8 md:w-12 md:h-12 ${isActive ? item.highlightClass : "text-text"} transition-colors group-hover:text-black`} />
               </div>
-              <span className={`font-serif text-5xl md:text-[5.5rem] leading-none font-black uppercase tracking-tighter transition-all duration-300 group-hover:translate-x-4 ${isActive ? item.highlightClass : 'text-white'}`}>
+              <span className={`font-serif text-5xl md:text-[5.5rem] leading-none font-black uppercase tracking-tighter transition-all duration-300 group-hover:translate-x-4 ${isActive ? item.highlightClass : 'text-text'}`}>
                 {item.label}
               </span>
             </Link>

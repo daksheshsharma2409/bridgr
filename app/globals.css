@@ -1,33 +1,215 @@
 @import "tailwindcss";
 
-@theme {
-  --color-primary: #FF4D00;
-  --color-karma: #EAB308;
-  --color-online: #10B981;
-  --color-quest: #FF4D00;
-  --color-alert: #EF4444;
-  
-  --color-bg: #050505;
-  --color-card: #0A0A0A;
-  --color-text: #FAFAFA;
-  --color-muted: #666666;
+/* ────────────────────────────────────────────────────────────────
+   RUNTIME THEME VARIABLES
+   These are CSS custom properties that change when data-theme
+   changes on <html> — they are NOT inlined at build time.
+   ──────────────────────────────────────────────────────────────── */
 
-  --font-sans: var(--font-inter);
-  --font-serif: var(--font-dm-serif);
-  --font-heading: var(--font-space-grotesk);
-  --font-mono: var(--font-jetbrains-mono);
-
-  --radius-pill: 9999px;
-  --radius-card: 16px;
-  --radius-button: 8px;
-}
-
-:root {
-  background-color: var(--color-bg);
-  color: var(--color-text);
+:root,
+[data-theme="midnight"] {
+  --bridgr-primary:    #FF4D00;
+  --bridgr-karma:      #EAB308;
+  --bridgr-online:     #10B981;
+  --bridgr-quest:      #FF4D00;
+  --bridgr-alert:      #EF4444;
+  --bridgr-bg:         #050505;
+  --bridgr-background: #080808;
+  --bridgr-card:       #0A0A0A;
+  --bridgr-text:       #FAFAFA;
+  --bridgr-muted:      #666666;
+  --bridgr-border:     rgba(255, 255, 255, 0.1);
   color-scheme: dark;
 }
 
-body {
-  font-family: var(--font-sans);
+[data-theme="cyberpunk"] {
+  --bridgr-primary:    #00F5FF;
+  --bridgr-karma:      #FF00A0;
+  --bridgr-online:     #39FF14;
+  --bridgr-quest:      #FF00A0;
+  --bridgr-alert:      #FF00A0;
+  --bridgr-bg:         #050A1A;
+  --bridgr-background: #07101F;
+  --bridgr-card:       #0A1428;
+  --bridgr-text:       #E0FAFF;
+  --bridgr-muted:      #4A6A80;
+  --bridgr-border:     rgba(0, 245, 255, 0.2);
+  color-scheme: dark;
 }
+
+[data-theme="forest"] {
+  --bridgr-primary:    #22C55E;
+  --bridgr-karma:      #EAB308;
+  --bridgr-online:     #86EFAC;
+  --bridgr-quest:      #22C55E;
+  --bridgr-alert:      #F97316;
+  --bridgr-bg:         #061210;
+  --bridgr-background: #071714;
+  --bridgr-card:       #0C1F1A;
+  --bridgr-text:       #ECFDF5;
+  --bridgr-muted:      #4D7A68;
+  --bridgr-border:     rgba(34, 197, 94, 0.2);
+  color-scheme: dark;
+}
+
+[data-theme="vaporwave"] {
+  --bridgr-primary:    #A855F7;
+  --bridgr-karma:      #FF6EC7;
+  --bridgr-online:     #2DD4BF;
+  --bridgr-quest:      #A855F7;
+  --bridgr-alert:      #FF6EC7;
+  --bridgr-bg:         #0D0016;
+  --bridgr-background: #120020;
+  --bridgr-card:       #1A002E;
+  --bridgr-text:       #F0E6FF;
+  --bridgr-muted:      #6B4E8A;
+  --bridgr-border:     rgba(168, 85, 247, 0.2);
+  color-scheme: dark;
+}
+
+/* ────── LIGHT MODE THEMES ───────────────────────────────── */
+
+/* ☀️ Solar Cream — warm, editorial, notebook aesthetic */
+[data-theme="solar"] {
+  --bridgr-primary:    #E86B00;
+  --bridgr-karma:      #D97706;
+  --bridgr-online:     #16A34A;
+  --bridgr-quest:      #E86B00;
+  --bridgr-alert:      #DC2626;
+  --bridgr-bg:         #FDFAF4;
+  --bridgr-background: #F5F0E8;
+  --bridgr-card:       #FFFFFF;
+  --bridgr-text:       #1A1208;
+  --bridgr-muted:      #9A8A75;
+  --bridgr-border:     rgba(26, 18, 8, 0.1);
+  color-scheme: light;
+}
+
+/* 🌊 Ocean Breeze — sky blue, clean, professional */
+[data-theme="ocean"] {
+  --bridgr-primary:    #0066FF;
+  --bridgr-karma:      #F59E0B;
+  --bridgr-online:     #10B981;
+  --bridgr-quest:      #0066FF;
+  --bridgr-alert:      #EF4444;
+  --bridgr-bg:         #F0F6FF;
+  --bridgr-background: #E6F0FF;
+  --bridgr-card:       #FFFFFF;
+  --bridgr-text:       #0A1628;
+  --bridgr-muted:      #728AAB;
+  --bridgr-border:     rgba(10, 22, 40, 0.1);
+  color-scheme: light;
+}
+
+/* 🌸 Petal — soft rose, warm, creative */
+[data-theme="petal"] {
+  --bridgr-primary:    #E11D78;
+  --bridgr-karma:      #F97316;
+  --bridgr-online:     #16A34A;
+  --bridgr-quest:      #E11D78;
+  --bridgr-alert:      #DC2626;
+  --bridgr-bg:         #FFF5F9;
+  --bridgr-background: #FFE8F0;
+  --bridgr-card:       #FFFFFF;
+  --bridgr-text:       #2D0A1A;
+  --bridgr-muted:      #8A4D6E;
+  --bridgr-border:     rgba(45, 10, 26, 0.1);
+  color-scheme: light;
+}
+
+/* 🌿 Sage — mint green, fresh, calm */
+[data-theme="sage"] {
+  --bridgr-primary:    #15803D;
+  --bridgr-karma:      #CA8A04;
+  --bridgr-online:     #15803D;
+  --bridgr-quest:      #15803D;
+  --bridgr-alert:      #DC2626;
+  --bridgr-bg:         #F2FAF5;
+  --bridgr-background: #E6F5EC;
+  --bridgr-card:       #FFFFFF;
+  --bridgr-text:       #0A1F10;
+  --bridgr-muted:      #3D5C45;
+  --bridgr-border:     rgba(10, 31, 16, 0.1);
+  color-scheme: light;
+}
+
+/* ────────────────────────────────────────────────────────────────
+   TAILWIND v4 DESIGN TOKENS
+   Using `@theme inline` so Tailwind utilities emit var() calls
+   instead of static hex values, allowing runtime theme switching.
+   ──────────────────────────────────────────────────────────────── */
+
+
+@theme inline {
+  --color-primary:    var(--bridgr-primary);
+  --color-karma:      var(--bridgr-karma);
+  --color-online:     var(--bridgr-online);
+  --color-quest:      var(--bridgr-quest);
+  --color-alert:      var(--bridgr-alert);
+  --color-bg:         var(--bridgr-bg);
+  --color-background: var(--bridgr-background);
+  --color-card:       var(--bridgr-card);
+  --color-text:       var(--bridgr-text);
+  --color-muted:      var(--bridgr-muted);
+  --color-border-subtle: var(--bridgr-border);
+
+  --font-sans:    var(--font-inter);
+  --font-serif:   var(--font-dm-serif);
+  --font-heading: var(--font-space-grotesk);
+  --font-mono:    var(--font-jetbrains-mono);
+
+  --radius-pill:   9999px;
+  --radius-card:   16px;
+  --radius-button: 8px;
+}
+
+.bento-glow {
+  box-shadow: 0 0 25px -5px var(--bridgr-border);
+}
+
+/* ────────────────────────────────────────────────────────────────
+   BASE STYLES
+   ──────────────────────────────────────────────────────────────── */
+
+body {
+  background-color: var(--bridgr-bg);
+  color: var(--bridgr-text);
+  font-family: var(--font-inter);
+}
+
+/* ────────────────────────────────────────────────────────────────
+   ANIMATIONS
+   ──────────────────────────────────────────────────────────────── */
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes float-up {
+  0%   { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-40px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px var(--bridgr-primary), 0 0 20px var(--bridgr-primary); }
+  50%       { box-shadow: 0 0 20px var(--bridgr-primary), 0 0 60px var(--bridgr-primary); }
+}
+
+.shimmer-gold {
+  background: linear-gradient(
+    120deg,
+    var(--bridgr-karma) 0%,
+    #fff8d6 40%,
+    var(--bridgr-karma) 60%,
+    #b8860b 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 2.5s linear infinite;
+}
+
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }

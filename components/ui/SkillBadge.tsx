@@ -11,7 +11,7 @@ export function SkillBadge({ name, categoryColorClass, emoji, className }: Skill
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-sm font-heading font-semibold text-white",
+        "inline-flex items-center gap-1.5 px-3 py-1 rounded-pill text-sm font-heading font-semibold text-text",
         categoryColorClass,
         className
       )}

@@ -1,4 +1,4 @@
-import { FeedItem, Quest, Room, Skill } from "./MockDataContext";
+import { FeedItem, Quest, Room, Skill, UserProfile } from "./MockDataContext";
 
 const FIRST_NAMES = ["Arjun", "Priya", "Rohan", "Sneha", "Karan", "Ananya", "Vikram", "Neha", "Rahul", "Aisha", "Dev", "Zara", "Omar", "Tara", "Sam", "Meera"];
 const LAST_INITIALS = ["M.", "P.", "D.", "K.", "S.", "V.", "R.", "A.", "G.", "N."];
@@ -102,4 +102,86 @@ export function generateRooms(count: number): Room[] {
       theme: getRandom(THEMES)
     };
   });
+}
+
+export function generateUsers(count: number): UserProfile[] {
+  const bios = [
+    "I speak Python and drink too much iced coffee. Don't be shy!",
+    "Will trade clean CSS modules for any help with Calculus III.",
+    "Machine learning enthusiast trying to make sense of loss functions.",
+    "Professional Googler. Semi-professional React developer."
+  ];
+
+  const quirks = [
+    "Knows how to fix the 3D printer jam in the basement.",
+    "Expert at resolving weird Next.js caching bugs.",
+    "Can configure a Webpack setup from memory.",
+    "Found the best coffee vending machine on campus."
+  ];
+
+  const learning = ["Rust & WebAssembly", "Unreal Engine 5", "Game Theory", "Distributed Systems"];
+  
+  const vibes = ["😇 Patient Teacher", "⚡ Quick Fixer", "🦉 Late Night Savior", "🤓 Deep Diver"];
+  const wins = ["Helped 3 people with Next.js caching today.", "Guided a freshman through Git push.", "Fixed the robotics lab server overload."];
+  const exchanges = [
+    "Will help with tricky CSS in exchange for a large Monster Energy.",
+    "Help me with PyTorch and I'll debug your React components.",
+    "Will proofread your system design doc for a coffee."
+  ];
+  const interests = ["🎵 Punjabi Pop", "♟️ Chess", "🎮 FIFA 24", "📸 Film Photography", "🎸 Indie Rock"];
+  
+  const genUsers = Array.from({ length: count }).map((_, i) => {
+    const name = getRandom(FIRST_NAMES);
+    return {
+      id: `usr_${i}`,
+      username: `${name.toLowerCase()}${Math.floor(random() * 999)}`,
+      name: `${name} ${getRandom(LAST_INITIALS)}`,
+      avatarChar: getRandom(AVATARS),
+      bio: getRandom(bios),
+      karma: Math.floor(random() * 2000),
+      signal: getRandom(["open", "flow", "offline"]) as UserProfile["signal"],
+      superpowers: getRandomSubset(SKILL_POOL, 3),
+      quirks: getRandomSubset(quirks, 2),
+      learning: getRandom(learning),
+      location: {
+        current: getRandom(BLOCK_NAMES),
+        spot: getRandom(ROOM_PURPOSES)
+      },
+      vibeTags: getRandomSubset(vibes, 2),
+      wins: getRandomSubset(wins, 2),
+      exchange: getRandom(exchanges),
+      interests: getRandomSubset(interests, 3)
+    };
+  });
+
+  // Always inject the default user at index 0
+  const defaultUser: UserProfile = {
+    id: "self_1",
+    username: "bridgr_newbie",
+    name: "Dakshesh S.",
+    avatarChar: "😎",
+    bio: "I speak Python and drink way too much iced coffee. Don't be shy!",
+    karma: 142,
+    signal: "open",
+    superpowers: getRandomSubset(SKILL_POOL, 3),
+    quirks: ["Knows how to fix the 3D printer jam in the basement.", "Expert at resolving weird Next.js caching bugs."],
+    learning: "Rust & WebAssembly",
+    location: { current: "Pixel Pilots Design Hub", spot: "The Vending Machine Corner, Block B" },
+    vibeTags: ["😇 Patient Teacher", "⚡ Quick Fixer", "🦉 Late Night Savior"],
+    wins: ["Helped 3 people with Next.js App Router caching today.", "Guided a freshman through their first Git push."],
+    exchange: "Will help with tricky CSS layouts in exchange for a large Monster Energy.",
+    interests: ["🎵 Punjabi Pop", "♟️ Chess", "🎮 FIFA 24"]
+  };
+
+  return [defaultUser, ...genUsers];
+}
+
+export function initializeMockData() {
+  seed = 12345; // Reset seed to prevent HMR drift generating different IDs
+  return {
+    initialFeed: generateFeed(30),
+    initialQuests: generateQuests(30),
+    initialRooms: generateRooms(30),
+    initialUsers: generateUsers(30)
+  };
 }

@@ -27,7 +27,7 @@ export default function QuestsBoard() {
     <div ref={container} className="space-y-6 max-w-3xl mx-auto pb-10">
       <div className="flex justify-between items-end mb-6">
         <div>
-          <h2 className="text-3xl font-heading font-bold text-white tracking-tight uppercase">Quest Board</h2>
+          <h2 className="text-3xl font-heading font-bold text-text tracking-tight uppercase">Quest Board</h2>
           <p className="text-sm text-quest mt-1 font-medium select-none">Active projects and open parties.</p>
         </div>
         <button className="bg-quest hover:bg-quest/90 text-black px-4 py-2 rounded-button text-sm font-heading font-bold flex items-center gap-2 transition-colors shadow-[0_0_15px_rgba(249,115,22,0.4)] hover:shadow-[0_0_25px_rgba(249,115,22,0.6)]">
@@ -40,7 +40,7 @@ export default function QuestsBoard() {
           <button 
             key={filter} 
             className={`whitespace-nowrap px-4 py-1.5 rounded-pill text-sm font-heading font-bold transition-colors ${
-              i === 0 ? "bg-quest text-black" : "bg-card border border-white/5 text-muted hover:text-white"
+              i === 0 ? "bg-quest text-black" : "bg-card border border-border-subtle text-muted hover:text-text"
             }`}
           >
             {filter}

@@ -29,7 +29,7 @@ export function QuestCard({ id, title, description, skillsNeeded, partySize, cur
       </div>
       
       <div className="flex justify-between items-start mb-2 mt-1">
-        <h3 className="font-heading text-xl font-bold flex items-center gap-2 text-white">
+        <h3 className="font-heading text-xl font-bold flex items-center gap-2 text-text">
           {title} <Flame className="w-4 h-4 text-quest" />
         </h3>
         <div className={cn(
@@ -45,7 +45,7 @@ export function QuestCard({ id, title, description, skillsNeeded, partySize, cur
       <div className="flex justify-between items-end">
         <div className="flex flex-wrap gap-2">
           {skillsNeeded.map((s, i) => (
-            <span key={i} className={cn("text-xs font-heading font-semibold px-2 py-0.5 rounded border border-white/10 text-white/90 bg-opacity-20", s.color)}>
+            <span key={i} className={cn("text-xs font-heading font-semibold px-2 py-0.5 rounded border border-border-subtle text-text bg-opacity-20", s.color)}>
               {s.emoji} {s.name}
             </span>
           ))}
@@ -59,7 +59,7 @@ export function QuestCard({ id, title, description, skillsNeeded, partySize, cur
           </button>
         )}
         {isFull && (
-          <span className="text-xs font-heading font-bold text-muted border border-white/10 px-4 py-1 rounded-lg">Party Full</span>
+          <span className="text-xs font-heading font-bold text-muted border border-border-subtle px-4 py-1 rounded-lg">Party Full</span>
         )}
       </div>
     </div>

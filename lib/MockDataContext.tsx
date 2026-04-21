@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState } from "react";
-import { generateFeed, generateQuests, generateRooms } from "./mockDataGenerator";
+import { initializeMockData } from "./mockDataGenerator";
 
 // Types
 export type Skill = { name: string; color: string; emoji: string };
@@ -34,21 +34,42 @@ export type Room = {
   theme: "primary" | "quest" | "online" | "alert";
 };
 
+export type UserProfile = {
+  id: string;
+  username: string;
+  name: string;
+  avatarChar: string;
+  bio: string;
+  karma: number;
+  signal: "open" | "flow" | "offline";
+  superpowers: Skill[];
+  quirks: string[];
+  learning: string;
+  location: {
+    current: string;
+    spot: string;
+  };
+  vibeTags: string[];
+  wins: string[];
+  exchange: string;
+  interests: string[];
+};
+
 type MockDataState = {
   feed: FeedItem[];
   quests: Quest[];
   rooms: Room[];
+  users: UserProfile[];
+  currentUser: UserProfile;
   addFeedItem: (item: Omit<FeedItem, "id">) => void;
   joinQuest: (id: string) => void;
   enterRoom: (id: string) => void;
-  currentUserKarma: number;
-  incrementKarma: (amount: number) => void;
+  updateUserSignal: (signal: UserProfile["signal"]) => void;
+  updateUserProfile: (username: string, updates: Partial<UserProfile>) => void;
 };
 
 // Initial Data generated procedurally to seed the state
-const initialFeed: FeedItem[] = generateFeed(30);
-const initialQuests: Quest[] = generateQuests(30);
-const initialRooms: Room[] = generateRooms(30);
+const { initialFeed, initialQuests, initialRooms, initialUsers } = initializeMockData();
 
 // Context
 const MockDataContext = createContext<MockDataState | undefined>(undefined);
@@ -57,7 +78,19 @@ export function MockDataProvider({ children }: { children: React.ReactNode }) {
   const [feed, setFeed] = useState<FeedItem[]>(initialFeed);
   const [quests, setQuests] = useState<Quest[]>(initialQuests);
   const [rooms, setRooms] = useState<Room[]>(initialRooms);
-  const [currentUserKarma, setCurrentUserKarma] = useState(142);
+  const [users, setUsers] = useState<UserProfile[]>(initialUsers);
+
+  React.useEffect(() => {
+    try {
+      const stored = localStorage.getItem("bridgr_mock_users");
+      if (stored) {
+        setUsers(JSON.parse(stored));
+      }
+    } catch (e) {}
+  }, []);
+
+  // Default currentUser is the 0th index from the generator ("bridgr_newbie")
+  const currentUser = users[0];
 
   const addFeedItem = (item: Omit<FeedItem, "id">) => {
     setFeed(prev => [{ ...item, id: `f${Date.now()}` }, ...prev]);
@@ -81,12 +114,26 @@ export function MockDataProvider({ children }: { children: React.ReactNode }) {
     }));
   };
 
-  const incrementKarma = (amount: number) => {
-    setCurrentUserKarma(prev => prev + amount);
+  const updateUserProfile = (username: string, updates: Partial<UserProfile>) => {
+    setUsers(prev => {
+      const copy = [...prev];
+      const idx = copy.findIndex(u => u.username === username);
+      if (idx !== -1) {
+        copy[idx] = { ...copy[idx], ...updates };
+        try {
+          localStorage.setItem("bridgr_mock_users", JSON.stringify(copy));
+        } catch {}
+      }
+      return copy;
+    });
+  };
+
+  const updateUserSignal = (signal: UserProfile["signal"]) => {
+    updateUserProfile(currentUser.username, { signal });
   };
 
   return (
-    <MockDataContext.Provider value={{ feed, quests, rooms, addFeedItem, joinQuest, enterRoom, currentUserKarma, incrementKarma }}>
+    <MockDataContext.Provider value={{ feed, quests, rooms, users, currentUser, addFeedItem, joinQuest, enterRoom, updateUserSignal, updateUserProfile }}>
       {children}
     </MockDataContext.Provider>
   );
