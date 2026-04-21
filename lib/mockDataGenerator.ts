@@ -150,7 +150,25 @@ export function generateUsers(count: number): UserProfile[] {
       vibeTags: getRandomSubset(vibes, 2),
       wins: getRandomSubset(wins, 2),
       exchange: getRandom(exchanges),
-      interests: getRandomSubset(interests, 3)
+      interests: getRandomSubset(interests, 3),
+      projects: [
+        {
+          name: "Bridgr skill-signal app",
+          description: "Peer help discovery app for campus collaboration.",
+          repoUrl: `https://github.com/${name.toLowerCase()}/bridgr`,
+          liveUrl: "",
+        },
+        {
+          name: "Dorm task allocator bot",
+          description: "Assigns rotating chores using fairness scoring.",
+          repoUrl: `https://github.com/${name.toLowerCase()}/dorm-bot`,
+          liveUrl: "",
+        },
+      ],
+      socialLinks: [
+        { title: "GitHub", url: "https://github.com/" + name.toLowerCase() },
+        { title: "LinkedIn", url: "https://linkedin.com/in/" + name.toLowerCase() },
+      ],
     };
   });
 
@@ -170,7 +188,25 @@ export function generateUsers(count: number): UserProfile[] {
     vibeTags: ["😇 Patient Teacher", "⚡ Quick Fixer", "🦉 Late Night Savior"],
     wins: ["Helped 3 people with Next.js App Router caching today.", "Guided a freshman through their first Git push."],
     exchange: "Will help with tricky CSS layouts in exchange for a large Monster Energy.",
-    interests: ["🎵 Punjabi Pop", "♟️ Chess", "🎮 FIFA 24"]
+    interests: ["🎵 Punjabi Pop", "♟️ Chess", "🎮 FIFA 24"],
+    projects: [
+      {
+        name: "Bridgr",
+        description: "Campus collaboration and expertise routing platform.",
+        repoUrl: "https://github.com/bridgr_newbie/bridgr",
+        liveUrl: "",
+      },
+      {
+        name: "Peer Debug Scheduler",
+        description: "Slot-based debugging sessions for labs and hostels.",
+        repoUrl: "https://github.com/bridgr_newbie/peer-debug-scheduler",
+        liveUrl: "",
+      },
+    ],
+    socialLinks: [
+      { title: "GitHub", url: "https://github.com/bridgr_newbie" },
+      { title: "LinkedIn", url: "https://linkedin.com/in/dakshesh" },
+    ],
   };
 
   return [defaultUser, ...genUsers];

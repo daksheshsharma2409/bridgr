@@ -1,12 +1,12 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import gsap from "gsap";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { ProfileCard } from "@/components/ui/ProfileCard";
 import { SignalBadge } from "@/components/ui/SignalBadge";
-import { MessageSquare, Terminal, Zap, Ghost } from "lucide-react";
+import { MessageSquare, Terminal, Zap } from "lucide-react";
 import { useMockData } from "@/lib/MockDataContext";
 import { cn } from "@/lib/utils";
 
@@ -14,23 +14,46 @@ export default function Lobby() {
   const container = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
-  const { feed, users, addFeedItem } = useMockData();
+  const { feed, users, addFeedItem, offerHelp, currentUser } = useMockData();
   const [newPost, setNewPost] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handlePost = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPost.trim()) return;
     addFeedItem({
       type: "request",
-      author: { name: "Dakshesh S.", handle: "@bridgr_newbie", avatarChar: "😎" },
+      author: { name: currentUser.name, handle: `@${currentUser.username}`, avatarChar: currentUser.avatarChar },
       timeAgo: "Just now",
       content: newPost,
       skills: [],
-      tags: ["NEW REQUEST"]
+      tags: ["NEW REQUEST", "STRUCTURED HELP"]
     });
     setNewPost("");
   };
+
+  const filteredFeed = useMemo(() => {
+    return feed.filter((item) => {
+      const byFilter =
+        activeFilter === "All" ||
+        (activeFilter === "Skills" && item.skills.length > 0) ||
+        (activeFilter === "Quests" && item.type === "quest") ||
+        (activeFilter === "Events" && item.type === "event");
+
+      const searchableText = [
+        item.author.name,
+        item.author.handle,
+        item.content,
+        item.tags.join(" "),
+        item.skills.map((s) => s.name).join(" "),
+      ]
+        .join(" ")
+        .toLowerCase();
+      const bySearch = searchableText.includes(searchTerm.toLowerCase());
+      return byFilter && bySearch;
+    });
+  }, [activeFilter, feed, searchTerm]);
 
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
@@ -90,7 +113,7 @@ export default function Lobby() {
   };
 
   return (
-    <div ref={container} className="space-y-6 max-w-2xl mx-auto pb-10">
+    <div ref={container} className="space-y-4 md:space-y-6 max-w-3xl mx-auto pb-6 md:pb-10">
       {/* Header */}
       <div className="header-anim flex justify-between items-end mb-6">
         <div>
@@ -102,14 +125,21 @@ export default function Lobby() {
           </h2>
           <p className="text-sm font-mono text-primary mt-1">Campus heartbeat • 42 Nerds Online</p>
         </div>
-        <div className="bg-card px-4 py-2 rounded-full border border-border-subtle text-sm font-semibold flex items-center gap-2 cursor-pointer hover:bg-background/50 transition-colors shadow-sm">
+        <div className="bg-card px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-border-subtle text-xs md:text-sm font-semibold flex items-center gap-2 cursor-pointer hover:bg-background/50 transition-colors shadow-sm">
           Signal: <SignalBadge status="open" showText={true} />
         </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="header-anim flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-        {["All", "Skills", "Quests", "Events", "Ghost Mode"].map((filter) => (
+      <div className="header-anim space-y-3">
+        <input
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search people, skills, or help requests..."
+          className="w-full bg-card border border-border-subtle rounded-card px-4 py-2.5 text-sm text-text placeholder:text-muted outline-none focus:border-primary transition-colors"
+        />
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+        {["All", "Skills", "Quests", "Events"].map((filter) => (
           <button
             key={filter}
             onClick={() => setActiveFilter(filter)}
@@ -122,17 +152,33 @@ export default function Lobby() {
             {filter}
           </button>
         ))}
+        </div>
       </div>
 
       {/* Assemble Action */}
-      <div className="header-anim grid grid-cols-2 gap-3 mb-8">
-        <button className="bg-card hover:bg-card/80 transition-all p-4 rounded-xl border border-border-subtle flex flex-row items-center justify-center gap-3 text-text font-heading font-bold hover:shadow-[0_0_20px_var(--color-primary)] group">
+      <div className="header-anim grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3 mb-6">
+          <button
+            onClick={() => {
+              addFeedItem({
+                type: "request",
+                author: { name: currentUser.name, handle: `@${currentUser.username}`, avatarChar: currentUser.avatarChar },
+                timeAgo: "Just now",
+                content: "Assembling a quick pod to solve blockers in JavaScript, Python, and Docker setup. Drop your issue here.",
+                skills: [],
+                tags: ["POD CALL", "STRUCTURED HELP"],
+              });
+            }}
+            className="bg-card hover:bg-card/80 transition-all p-4 rounded-xl border border-border-subtle flex flex-row items-center justify-center gap-3 text-text font-heading font-bold hover:shadow-[0_0_20px_var(--color-primary)] group"
+          >
           <Terminal className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
           Assemble the Nerds
         </button>
-        <button className="bg-card hover:bg-card/80 transition-all p-4 rounded-xl border border-border-subtle flex flex-row items-center justify-center gap-3 text-text font-heading font-bold hover:shadow-[0_0_20px_var(--color-karma)] group">
-          <Ghost className="w-5 h-5 text-muted group-hover:text-karma group-hover:scale-110 transition-all" />
-          Ghost Mode
+        <button
+          onClick={() => setActiveFilter("Skills")}
+          className="bg-card hover:bg-card/80 transition-all p-4 rounded-xl border border-border-subtle flex flex-row items-center justify-center gap-3 text-text font-heading font-bold hover:shadow-[0_0_20px_var(--color-karma)] group"
+        >
+          <Zap className="w-5 h-5 text-karma group-hover:scale-110 transition-all" />
+          Skills Needed
         </button>
       </div>
 
@@ -151,8 +197,8 @@ export default function Lobby() {
           />
           {users.slice(1, 14).map((user) => (
             <Link key={user.id} href={`/profile/${user.username}`} className="relative z-10">
-              <div className="min-w-[130px] h-full bg-card hover:bg-background/50 transition-all border border-border-subtle rounded-2xl p-4 flex flex-col items-center justify-center gap-2 shadow-lg cursor-pointer snap-start group">
-                <div className="w-14 h-14 bg-background border border-border-subtle rounded-full flex items-center justify-center text-2xl group-hover:scale-110 transition-transform relative">
+              <div className="min-w-[112px] md:min-w-[130px] h-full bg-card hover:bg-background/50 transition-all border border-border-subtle rounded-2xl p-3 md:p-4 flex flex-col items-center justify-center gap-2 shadow-lg cursor-pointer snap-start group">
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-background border border-border-subtle rounded-full flex items-center justify-center text-xl md:text-2xl group-hover:scale-110 transition-transform relative">
                   {user.avatarChar}
                   <div className={cn(
                     "absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-card",
@@ -195,7 +241,7 @@ export default function Lobby() {
       {/* Feed List with AnimatePresence */}
       <div className="space-y-4 pt-2">
         <AnimatePresence>
-          {feed.map((item) => {
+          {filteredFeed.map((item) => {
             if (item.type === "request") {
               return (
                 <motion.div
@@ -230,8 +276,12 @@ export default function Lobby() {
                       ))}
                     </div>
                   )}
-                  <button className="mt-2 w-full bg-card hover:bg-background/50 border border-border-subtle text-text py-2.5 rounded-xl font-heading font-bold flex justify-center items-center gap-2 transition-all">
-                    <MessageSquare className="w-4 h-4" /> Offer Help
+                  <button
+                    onClick={() => offerHelp(item.id)}
+                    disabled={item.author.handle === `@${currentUser.username}` || item.tags.includes("HELP OFFERED")}
+                    className="mt-2 w-full bg-card hover:bg-background/50 disabled:hover:bg-card disabled:opacity-50 border border-border-subtle text-text py-2.5 rounded-xl font-heading font-bold flex justify-center items-center gap-2 transition-all"
+                  >
+                    <MessageSquare className="w-4 h-4" /> {item.author.handle === `@${currentUser.username}` ? "Your Request" : item.tags.includes("HELP OFFERED") ? "Help Offered" : "Offer Help"}
                   </button>
                 </motion.div>
               );
@@ -239,6 +289,11 @@ export default function Lobby() {
             return null;
           })}
         </AnimatePresence>
+        {filteredFeed.length === 0 && (
+          <div className="bg-card border border-border-subtle rounded-card p-5 text-center text-sm text-muted">
+            No requests matched your search and filters.
+          </div>
+        )}
       </div>
     </div>
   );

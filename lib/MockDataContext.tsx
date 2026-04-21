@@ -5,6 +5,13 @@ import { initializeMockData } from "./mockDataGenerator";
 
 // Types
 export type Skill = { name: string; color: string; emoji: string };
+export type SocialLink = { title: string; url: string };
+export type ProjectLink = {
+  name: string;
+  description: string;
+  repoUrl: string;
+  liveUrl?: string;
+};
 
 export type FeedItem = {
   id: string;
@@ -53,7 +60,44 @@ export type UserProfile = {
   wins: string[];
   exchange: string;
   interests: string[];
+  projects: ProjectLink[];
+  socialLinks: SocialLink[];
 };
+
+function normalizeUserProfile(user: UserProfile): UserProfile {
+  const normalizedProjects = Array.isArray(user.projects)
+    ? user.projects
+        .map((project) => {
+          if (!project || typeof project !== "object") return null;
+          const candidate = project as Partial<ProjectLink>;
+          if (!candidate.name || !candidate.description || !candidate.repoUrl) return null;
+          return {
+            name: candidate.name,
+            description: candidate.description,
+            repoUrl: candidate.repoUrl,
+            liveUrl: candidate.liveUrl || "",
+          };
+        })
+        .filter((project): project is ProjectLink => Boolean(project))
+    : [];
+
+  const normalizedSocialLinks = Array.isArray(user.socialLinks)
+    ? user.socialLinks
+        .map((link) => {
+          if (!link || typeof link !== "object") return null;
+          const candidate = link as Partial<SocialLink>;
+          if (!candidate.title || !candidate.url) return null;
+          return { title: candidate.title, url: candidate.url };
+        })
+        .filter((link): link is SocialLink => Boolean(link))
+    : [];
+
+  return {
+    ...user,
+    projects: normalizedProjects,
+    socialLinks: normalizedSocialLinks,
+  };
+}
 
 type MockDataState = {
   feed: FeedItem[];
@@ -62,7 +106,9 @@ type MockDataState = {
   users: UserProfile[];
   currentUser: UserProfile;
   addFeedItem: (item: Omit<FeedItem, "id">) => void;
+  offerHelp: (feedId: string) => void;
   joinQuest: (id: string) => void;
+  createQuest: (quest: Omit<Quest, "id" | "currentMembers">) => void;
   enterRoom: (id: string) => void;
   updateUserSignal: (signal: UserProfile["signal"]) => void;
   updateUserProfile: (username: string, updates: Partial<UserProfile>) => void;
@@ -78,22 +124,70 @@ export function MockDataProvider({ children }: { children: React.ReactNode }) {
   const [feed, setFeed] = useState<FeedItem[]>(initialFeed);
   const [quests, setQuests] = useState<Quest[]>(initialQuests);
   const [rooms, setRooms] = useState<Room[]>(initialRooms);
-  const [users, setUsers] = useState<UserProfile[]>(initialUsers);
+  const [users, setUsers] = useState<UserProfile[]>(initialUsers.map(normalizeUserProfile));
 
   React.useEffect(() => {
     try {
-      const stored = localStorage.getItem("bridgr_mock_users");
-      if (stored) {
-        setUsers(JSON.parse(stored));
+      const storedUsers = localStorage.getItem("bridgr_mock_users");
+      const storedFeed = localStorage.getItem("bridgr_mock_feed");
+      const storedQuests = localStorage.getItem("bridgr_mock_quests");
+      const storedRooms = localStorage.getItem("bridgr_mock_rooms");
+
+      if (storedUsers) {
+        const parsed = JSON.parse(storedUsers) as UserProfile[];
+        setUsers(parsed.map(normalizeUserProfile));
       }
+      if (storedFeed) setFeed(JSON.parse(storedFeed));
+      if (storedQuests) setQuests(JSON.parse(storedQuests));
+      if (storedRooms) setRooms(JSON.parse(storedRooms));
     } catch (e) {}
   }, []);
 
+  React.useEffect(() => {
+    try {
+      localStorage.setItem("bridgr_mock_feed", JSON.stringify(feed));
+    } catch {}
+  }, [feed]);
+
+  React.useEffect(() => {
+    try {
+      localStorage.setItem("bridgr_mock_quests", JSON.stringify(quests));
+    } catch {}
+  }, [quests]);
+
+  React.useEffect(() => {
+    try {
+      localStorage.setItem("bridgr_mock_rooms", JSON.stringify(rooms));
+    } catch {}
+  }, [rooms]);
+
+  React.useEffect(() => {
+    try {
+      localStorage.setItem("bridgr_mock_users", JSON.stringify(users));
+    } catch {}
+  }, [users]);
+
   // Default currentUser is the 0th index from the generator ("bridgr_newbie")
-  const currentUser = users[0];
+  const currentUser = users[0] ?? initialUsers[0];
 
   const addFeedItem = (item: Omit<FeedItem, "id">) => {
     setFeed(prev => [{ ...item, id: `f${Date.now()}` }, ...prev]);
+  };
+
+  const offerHelp = (feedId: string) => {
+    let wasApplied = false;
+    setFeed(prev => prev.map(item => {
+      if (item.id !== feedId) return item;
+      if (item.author.handle === `@${currentUser.username}`) return item;
+      if (item.tags.includes("HELP OFFERED")) return item;
+      wasApplied = true;
+      return { ...item, tags: [...item.tags, "HELP OFFERED"] };
+    }));
+    if (!wasApplied) return;
+    setUsers(prev => prev.map(user => {
+      if (user.username !== currentUser.username) return user;
+      return { ...user, karma: user.karma + 8 };
+    }));
   };
 
   const joinQuest = (id: string) => {
@@ -103,6 +197,18 @@ export function MockDataProvider({ children }: { children: React.ReactNode }) {
       }
       return q;
     }));
+    setUsers(prev => prev.map(user => {
+      if (user.username !== currentUser.username) return user;
+      return { ...user, karma: user.karma + 5 };
+    }));
+  };
+
+  const createQuest = (quest: Omit<Quest, "id" | "currentMembers">) => {
+    setQuests(prev => [{
+      ...quest,
+      id: `quest_custom_${Date.now()}`,
+      currentMembers: 1,
+    }, ...prev]);
   };
 
   const enterRoom = (id: string) => {
@@ -133,7 +239,7 @@ export function MockDataProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <MockDataContext.Provider value={{ feed, quests, rooms, users, currentUser, addFeedItem, joinQuest, enterRoom, updateUserSignal, updateUserProfile }}>
+    <MockDataContext.Provider value={{ feed, quests, rooms, users, currentUser, addFeedItem, offerHelp, joinQuest, createQuest, enterRoom, updateUserSignal, updateUserProfile }}>
       {children}
     </MockDataContext.Provider>
   );
