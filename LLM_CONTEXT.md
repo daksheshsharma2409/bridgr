@@ -11,6 +11,7 @@ Students struggle with niche technical hurdles while the solution exists in the 
 - **Typography**: Playfair Display (Heading), Inter (Sans), JetBrains Mono (Mono).
 - **Layout**: Bento-style grid with `rounded-3xl` corners and `.bento-glow` effects.
 - **Animations**: GSAP (Text Scramble, Count-up) + Framer Motion (Page transitions, Spring physics).
+- **Current UI Direction**: Mobile-first dark glass cards, neon-accent CTAs, compact stacked modules, and floating capsule dock inspired by tactile, high-contrast interfaces.
 
 ---
 
@@ -42,6 +43,8 @@ Students struggle with niche technical hurdles while the solution exists in the 
 - **Ghost Mode**: Removed completely from Lobby filters and actions.
 - **Data Persistence**: Feed, quests, rooms, and users persist via localStorage in `MockDataContext`.
 - **Mobile Density Pass**: Mobile dock, profile header, cards, and page paddings are intentionally compact to avoid bulky UI.
+- **Mobile Dock Routing**: Mobile dock uses document-level navigation (`window.location.assign`) to avoid client history patch/runtime issues.
+- **Visual System Reset**: Lobby, Leaderboard, Quests, and Map now use a unified card-first layout system (hero card + content cards) rather than mixed legacy bento fragments.
 - **Profile Expansion**: User profiles now support editable `projects` and `socialLinks`.
 - **Structured Profile Links**:
   - `socialLinks` are objects with `{ title, url }` and titles are clickable.

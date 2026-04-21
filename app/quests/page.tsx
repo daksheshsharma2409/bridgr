@@ -59,7 +59,8 @@ export default function QuestsBoard() {
   };
 
   return (
-    <div ref={container} className="space-y-4 md:space-y-6 max-w-3xl mx-auto pb-6 md:pb-10">
+    <div ref={container} className="space-y-4 md:space-y-6 max-w-4xl mx-auto pb-8">
+      <section className="rounded-3xl border border-border-subtle bg-card p-4 md:p-6">
       <div className="flex justify-between items-end mb-4 md:mb-6">
         <div>
           <h2 className="text-2xl md:text-3xl font-heading font-bold text-text tracking-tight uppercase">Quest Board</h2>
@@ -72,6 +73,7 @@ export default function QuestsBoard() {
           <Plus className="w-4 h-4" /> New Quest
         </button>
       </div>
+      </section>
       {showComposer && (
         <form onSubmit={handleCreateQuest} className="bg-card border border-border-subtle rounded-3xl p-4 md:p-5 space-y-3">
           <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Quest title" className="w-full bg-background border border-border-subtle rounded-xl px-3 py-2 text-sm text-text" />

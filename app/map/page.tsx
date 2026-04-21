@@ -18,20 +18,26 @@ export default function SpatialHub() {
 
   useLayoutEffect(() => {
     let ctx = gsap.context(() => {
-      gsap.from(".anim-item", {
-        opacity: 0,
-        x: -20,
-        stagger: 0.15,
-        duration: 0.6,
-        ease: "power2.out"
-      });
+      gsap.fromTo(
+        ".spatial-anim",
+        { autoAlpha: 0, x: -16 },
+        {
+          autoAlpha: 1,
+          x: 0,
+          stagger: 0.08,
+          duration: 0.45,
+          ease: "power2.out",
+          clearProps: "opacity,visibility,transform",
+        }
+      );
     }, container);
     return () => ctx.revert();
   }, []);
 
   return (
-    <div ref={container} className="space-y-4 md:space-y-6 max-w-4xl mx-auto pb-6 md:pb-10">
-      <div className="anim-item flex flex-col md:flex-row justify-between items-start md:items-end gap-3 md:gap-4 mb-4 md:mb-8 border-b border-border-subtle pb-4 md:pb-6">
+    <div ref={container} className="space-y-4 md:space-y-6 max-w-5xl mx-auto pb-8">
+      <section className="spatial-anim rounded-3xl border border-border-subtle bg-card p-4 md:p-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-3 md:gap-4">
         <div>
           <h2 className="text-2xl md:text-4xl font-heading font-black text-text tracking-tight uppercase">Spatial Hub</h2>
           <p className="text-sm font-mono text-primary mt-2">Physical Campus Club Rooms & Real-time Occupancy.</p>
@@ -41,10 +47,11 @@ export default function SpatialHub() {
            <span className="font-heading font-bold text-sm">Main Campus</span>
         </div>
       </div>
+      </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
         {rooms.map((room) => (
-          <div key={room.id} className="anim-item bg-card rounded-card border border-border-subtle p-4 md:p-6 hover:shadow-[0_0_20px_var(--color-primary)] transition-all cursor-pointer group relative overflow-hidden">
+          <div key={room.id} className="spatial-anim bg-card rounded-3xl border border-border-subtle p-4 md:p-5 hover:shadow-[0_0_20px_var(--color-primary)] transition-all cursor-pointer group relative overflow-hidden">
              <div className={`absolute top-0 right-0 w-32 h-32 ${themeClasses[room.theme].orb} opacity-10 rounded-full blur-[40px] group-hover:opacity-30 transition-opacity`} />
              
              <div className="flex justify-between items-start mb-4 relative z-10">

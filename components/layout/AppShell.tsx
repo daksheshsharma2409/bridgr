@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { KarmaCounter } from "../ui/KarmaCounter";
 import { FullScreenMenu } from "./FullScreenMenu";
 import { useState } from "react";
@@ -20,7 +20,6 @@ const NAV_ITEMS = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
   const { currentUser } = useMockData();
 
   // Dynamically attach the profile link to the current user
@@ -52,30 +51,28 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {/* Mobile Bottom Dock */}
       <nav 
-        className="md:hidden fixed bottom-0 left-0 w-full bg-card/95 backdrop-blur-md border-t border-border-subtle py-1.5 pb-[calc(env(safe-area-inset-bottom)+6px)] px-2 z-[999]"
+        className="md:hidden fixed bottom-0 left-0 w-full bg-card/95 backdrop-blur-xl border-t border-border-subtle py-2 pb-[calc(env(safe-area-inset-bottom)+8px)] px-2 z-[999]"
       >
-        <div className="flex items-center justify-around max-w-sm mx-auto">
+        <div className="grid grid-cols-5 gap-1 max-w-md mx-auto">
           {_navItems.map((item) => {
              const isActive = pathname === item.href;
              return (
-              <button
-                type="button"
+              <a
                  key={item.href}
-                onClick={() => {
-                  try {
-                    router.push(item.href);
-                  } catch {
-                    window.location.href = item.href;
-                  }
+                href={item.href}
+                onClick={(e) => {
+                  // Use document-level navigation on mobile to bypass client-history patch issues.
+                  e.preventDefault();
+                  window.location.assign(item.href);
                 }}
                  className={cn(
-                  "flex flex-col items-center p-1.5 gap-0.5 rounded-xl min-w-[52px] cursor-pointer transition-all active:scale-95 touch-manipulation",
-                  isActive ? "text-primary scale-105" : "text-muted hover:text-text"
+                  "flex flex-col items-center p-1.5 gap-0.5 rounded-xl cursor-pointer transition-all active:scale-95 touch-manipulation",
+                  isActive ? "bg-background text-primary" : "text-muted hover:text-text"
                  )}
                >
                 <item.icon className={cn("w-5 h-5 transition-all", isActive && "drop-shadow-[0_0_8px_var(--color-primary)]")} />
                 <span className="text-[9px] font-heading font-black uppercase tracking-wider mt-0.5">{item.label}</span>
-              </button>
+              </a>
              );
           })}
         </div>

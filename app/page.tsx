@@ -1,19 +1,12 @@
 "use client";
 
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
-import gsap from "gsap";
-import { motion, AnimatePresence } from "framer-motion";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ProfileCard } from "@/components/ui/ProfileCard";
 import { SignalBadge } from "@/components/ui/SignalBadge";
-import { MessageSquare, Terminal, Zap } from "lucide-react";
+import { MessageSquare, Search, Sparkles, Terminal } from "lucide-react";
 import { useMockData } from "@/lib/MockDataContext";
-import { cn } from "@/lib/utils";
 
 export default function Lobby() {
-  const container = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
   const { feed, users, addFeedItem, offerHelp, currentUser } = useMockData();
   const [newPost, setNewPost] = useState("");
   const [activeFilter, setActiveFilter] = useState("All");
@@ -55,246 +48,139 @@ export default function Lobby() {
     });
   }, [activeFilter, feed, searchTerm]);
 
-  useLayoutEffect(() => {
-    let ctx = gsap.context(() => {
-      // Text scramble effect on the title
-      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%";
-      const original = "THE LOBBY";
-      let iteration = 0;
-      const interval = setInterval(() => {
-        if (!titleRef.current) { clearInterval(interval); return; }
-        titleRef.current.innerText = original
-          .split("")
-          .map((letter, i) => {
-            if (i < iteration) return original[i];
-            return letter === " " ? " " : chars[Math.floor(Math.random() * chars.length)];
-          })
-          .join("");
-        if (iteration >= original.length) clearInterval(interval);
-        iteration += 0.5;
-      }, 30);
-
-      gsap.from(".header-anim", {
-        opacity: 0,
-        y: -20,
-        stagger: 0.08,
-        duration: 0.7,
-        ease: "power3.out",
-        delay: 0.2
-      });
-
-      gsap.from(".feed-item", {
-        opacity: 0,
-        y: 50,
-        stagger: 0.07,
-        duration: 0.7,
-        ease: "back.out(1.4)",
-        clearProps: "all"
-      });
-
-      // Glow orb follow mouse on discover rail
-      const rail = document.getElementById("discover-rail");
-      if (rail && glowRef.current) {
-        rail.addEventListener("mousemove", (e) => {
-          const rect = rail.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          gsap.to(glowRef.current, { x: x - 60, y: y - 60, duration: 0.3, ease: "power2.out" });
-        });
-      }
-    }, container);
-    return () => ctx.revert();
-  }, []);
-
-  const feedVariants = {
-    initial: { opacity: 0, x: 60, scale: 0.95 },
-    animate: { opacity: 1, x: 0, scale: 1, transition: { type: "spring" as const, damping: 20, stiffness: 200 } },
-    exit: { opacity: 0, x: -40, scale: 0.95, transition: { duration: 0.2 } },
-  };
-
   return (
-    <div ref={container} className="space-y-4 md:space-y-6 max-w-3xl mx-auto pb-6 md:pb-10">
-      {/* Header */}
-      <div className="header-anim flex justify-between items-end mb-6">
-        <div>
-          <h2
-            ref={titleRef}
-            className="text-3xl font-heading font-black text-text tracking-tight uppercase"
-          >
-            THE LOBBY
-          </h2>
-          <p className="text-sm font-mono text-primary mt-1">Campus heartbeat • 42 Nerds Online</p>
+    <div className="max-w-5xl mx-auto pb-8 space-y-4 md:space-y-6">
+      <section className="rounded-3xl border border-border-subtle bg-card p-4 md:p-6">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+          <div>
+            <h2 className="text-2xl md:text-4xl font-heading font-black tracking-tight text-text uppercase">The Lobby</h2>
+            <p className="text-xs md:text-sm font-mono text-muted mt-1">Find help fast. Offer help faster.</p>
+          </div>
+          <div className="inline-flex items-center gap-2 bg-background rounded-full border border-border-subtle px-3 py-1.5 text-xs">
+            <SignalBadge status={currentUser.signal} />
+            <span className="text-muted">You are currently</span>
+            <span className="font-bold text-text uppercase">{currentUser.signal}</span>
+          </div>
         </div>
-        <div className="bg-card px-3 py-1.5 md:px-4 md:py-2 rounded-full border border-border-subtle text-xs md:text-sm font-semibold flex items-center gap-2 cursor-pointer hover:bg-background/50 transition-colors shadow-sm">
-          Signal: <SignalBadge status="open" showText={true} />
-        </div>
-      </div>
-
-      {/* Filter Bar */}
-      <div className="header-anim space-y-3">
-        <input
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search people, skills, or help requests..."
-          className="w-full bg-card border border-border-subtle rounded-card px-4 py-2.5 text-sm text-text placeholder:text-muted outline-none focus:border-primary transition-colors"
-        />
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-        {["All", "Skills", "Quests", "Events"].map((filter) => (
-          <button
-            key={filter}
-            onClick={() => setActiveFilter(filter)}
-            className={`whitespace-nowrap px-4 py-1.5 rounded-pill text-sm font-heading font-bold transition-all ${
-              activeFilter === filter 
-                ? "bg-primary text-black shadow-[0_0_15px_var(--color-primary)]" 
-                : "bg-card border border-border-subtle text-muted hover:text-text"
-            }`}
-          >
-            {filter}
-          </button>
-        ))}
-        </div>
-      </div>
-
-      {/* Assemble Action */}
-      <div className="header-anim grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 mt-4">
           <button
             onClick={() => {
               addFeedItem({
                 type: "request",
                 author: { name: currentUser.name, handle: `@${currentUser.username}`, avatarChar: currentUser.avatarChar },
                 timeAgo: "Just now",
-                content: "Assembling a quick pod to solve blockers in JavaScript, Python, and Docker setup. Drop your issue here.",
+                content: "Quick collaboration pod forming now. Share blockers in this thread.",
                 skills: [],
                 tags: ["POD CALL", "STRUCTURED HELP"],
               });
             }}
-            className="bg-card hover:bg-card/80 transition-all p-4 rounded-xl border border-border-subtle flex flex-row items-center justify-center gap-3 text-text font-heading font-bold hover:shadow-[0_0_20px_var(--color-primary)] group"
+            className="h-11 rounded-xl bg-primary text-black font-heading font-bold text-sm flex items-center justify-center gap-2"
           >
-          <Terminal className="w-5 h-5 text-primary group-hover:scale-110 transition-transform" />
-          Assemble the Nerds
-        </button>
-        <button
-          onClick={() => setActiveFilter("Skills")}
-          className="bg-card hover:bg-card/80 transition-all p-4 rounded-xl border border-border-subtle flex flex-row items-center justify-center gap-3 text-text font-heading font-bold hover:shadow-[0_0_20px_var(--color-karma)] group"
-        >
-          <Zap className="w-5 h-5 text-karma group-hover:scale-110 transition-all" />
-          Skills Needed
-        </button>
-      </div>
-
-      {/* Discover Nerds Rail — with tracking glow orb */}
-      <div className="header-anim space-y-3 mb-8">
-        <h3 className="text-sm font-heading font-bold text-muted uppercase tracking-wider px-1">⚡ Discover Nerds</h3>
-        <div
-          id="discover-rail"
-          className="relative flex gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x"
-        >
-          {/* Glow orb */}
-          <div
-            ref={glowRef}
-            className="pointer-events-none absolute w-[120px] h-[120px] rounded-full opacity-20 blur-[40px] z-0"
-            style={{ background: "var(--color-primary)", top: 0, left: 0 }}
-          />
-          {users.slice(1, 14).map((user) => (
-            <Link key={user.id} href={`/profile/${user.username}`} className="relative z-10">
-              <div className="min-w-[112px] md:min-w-[130px] h-full bg-card hover:bg-background/50 transition-all border border-border-subtle rounded-2xl p-3 md:p-4 flex flex-col items-center justify-center gap-2 shadow-lg cursor-pointer snap-start group">
-                <div className="w-12 h-12 md:w-14 md:h-14 bg-background border border-border-subtle rounded-full flex items-center justify-center text-xl md:text-2xl group-hover:scale-110 transition-transform relative">
-                  {user.avatarChar}
-                  <div className={cn(
-                    "absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-card",
-                    user.signal === "open" ? "bg-online" : user.signal === "flow" ? "bg-alert" : "bg-gray-500"
-                  )} />
-                </div>
-                <div className="text-center w-full">
-                  <p className="font-heading font-bold text-xs text-text truncate w-full">{user.name.split(" ")[0]}</p>
-                  <p className="font-mono text-[10px] text-primary truncate w-full">@{user.username}</p>
-                </div>
-              </div>
-            </Link>
-          ))}
+            <Terminal className="w-4 h-4" /> Assemble Pod
+          </button>
+          <button
+            onClick={() => setActiveFilter("Skills")}
+            className="h-11 rounded-xl bg-background border border-border-subtle text-text font-heading font-bold text-sm"
+          >
+            Skills Needed
+          </button>
+          <button
+            onClick={() => setActiveFilter("Events")}
+            className="h-11 rounded-xl bg-background border border-border-subtle text-text font-heading font-bold text-sm"
+          >
+            Events
+          </button>
         </div>
-      </div>
+      </section>
 
-      {/* Create Post Form */}
-      <motion.form
-        onSubmit={handlePost}
-        className="header-anim flex flex-col relative mb-8"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5 }}
-      >
-        <textarea
-          value={newPost}
-          onChange={(e) => setNewPost(e.target.value)}
-          placeholder="Broadcast a blocker to the campus..."
-          className="w-full bg-card border border-border-subtle rounded-card px-4 pt-4 pb-12 text-sm text-text placeholder:text-muted outline-none focus:border-primary transition-all shadow-inner resize-none min-h-[100px]"
-        />
-        <button
-          type="submit"
-          disabled={!newPost.trim()}
-          className="absolute right-3 bottom-3 bg-primary hover:bg-primary/80 disabled:opacity-30 disabled:hover:bg-primary text-black px-5 py-2 rounded-lg text-sm font-heading font-bold transition-all"
-        >
-          Post Request
-        </button>
-      </motion.form>
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div className="lg:col-span-8 rounded-3xl border border-border-subtle bg-card p-4 md:p-5">
+          <div className="flex items-center gap-2 rounded-xl border border-border-subtle bg-background px-3 py-2">
+            <Search className="w-4 h-4 text-muted" />
+            <input
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search requests by skill, tag, name..."
+              className="w-full bg-transparent outline-none text-sm text-text placeholder:text-muted"
+            />
+          </div>
+          <div className="flex gap-2 overflow-x-auto py-3">
+            {["All", "Skills", "Quests", "Events"].map((filter) => (
+              <button
+                key={filter}
+                onClick={() => setActiveFilter(filter)}
+                className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap ${activeFilter === filter ? "bg-primary text-black" : "bg-background border border-border-subtle text-muted"}`}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
 
-      {/* Feed List with AnimatePresence */}
-      <div className="space-y-4 pt-2">
-        <AnimatePresence>
-          {filteredFeed.map((item) => {
-            if (item.type === "request") {
-              return (
-                <motion.div
-                  key={item.id}
-                  variants={feedVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  layout
-                  className="feed-item bg-card border border-border-subtle rounded-card p-5 shadow-lg relative max-w-full overflow-hidden group text-text"
-                >
-                  <div className="absolute top-0 left-0 w-1 h-full bg-alert shadow-[0_0_15px_var(--color-alert)] group-hover:shadow-[0_0_25px_var(--color-alert)] transition-all" />
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center font-heading font-bold text-xs border border-border-subtle">
-                      {item.author.avatarChar}
-                    </div>
-                    <div>
-                      <span className="font-heading font-bold tracking-tight text-sm">{item.author.name}</span>
-                      <span className="text-muted font-mono text-xs ml-2">{item.author.handle} • {item.timeAgo}</span>
-                    </div>
-                    {item.tags?.map((t) => (
-                      <div key={t} className="ml-auto bg-alert/10 text-alert text-[10px] uppercase font-black px-2 py-1 rounded">{t}</div>
+          <form onSubmit={handlePost} className="relative mb-4">
+            <textarea
+              value={newPost}
+              onChange={(e) => setNewPost(e.target.value)}
+              placeholder="Describe your blocker with clear context..."
+              className="w-full min-h-[110px] rounded-2xl border border-border-subtle bg-background p-3 pr-28 text-sm text-text resize-none"
+            />
+            <button type="submit" disabled={!newPost.trim()} className="absolute right-2 bottom-2 h-9 px-4 rounded-xl bg-primary text-black font-bold text-sm disabled:opacity-40">
+              Post
+            </button>
+          </form>
+
+          <div className="space-y-3">
+            {filteredFeed.filter((item) => item.type === "request").map((item) => (
+              <article key={item.id} className="rounded-2xl border border-border-subtle bg-background p-3 md:p-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-full border border-border-subtle bg-card flex items-center justify-center text-xs">{item.author.avatarChar}</div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-text truncate">{item.author.name}</p>
+                    <p className="text-[11px] font-mono text-muted truncate">{item.author.handle} • {item.timeAgo}</p>
+                  </div>
+                  <div className="ml-auto flex gap-1 flex-wrap justify-end">
+                    {item.tags.map((tag) => (
+                      <span key={tag} className="px-2 py-0.5 rounded-md bg-card border border-border-subtle text-[10px] font-bold text-muted">
+                        {tag}
+                      </span>
                     ))}
                   </div>
-                  <p className="text-sm mb-4 leading-relaxed text-text/90">{item.content}</p>
-                  {item.skills && item.skills.length > 0 && (
-                    <div className="flex gap-2 flex-wrap mb-3">
-                      {item.skills.map((s, i) => (
-                        <span key={i} className="text-xs border border-primary/40 bg-primary/10 text-primary px-2 py-1 rounded font-heading font-bold uppercase">
-                          {s.emoji} {s.name}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                </div>
+                <p className="mt-3 text-sm text-text/90">{item.content}</p>
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {item.skills.map((skill, idx) => (
+                    <span key={idx} className="px-2 py-1 rounded-lg text-[11px] font-bold bg-card border border-border-subtle text-text">
+                      {skill.emoji} {skill.name}
+                    </span>
+                  ))}
+                </div>
                   <button
                     onClick={() => offerHelp(item.id)}
                     disabled={item.author.handle === `@${currentUser.username}` || item.tags.includes("HELP OFFERED")}
-                    className="mt-2 w-full bg-card hover:bg-background/50 disabled:hover:bg-card disabled:opacity-50 border border-border-subtle text-text py-2.5 rounded-xl font-heading font-bold flex justify-center items-center gap-2 transition-all"
+                    className="mt-3 w-full h-10 rounded-xl border border-border-subtle bg-card disabled:opacity-50 text-sm font-bold flex items-center justify-center gap-2"
                   >
                     <MessageSquare className="w-4 h-4" /> {item.author.handle === `@${currentUser.username}` ? "Your Request" : item.tags.includes("HELP OFFERED") ? "Help Offered" : "Offer Help"}
                   </button>
-                </motion.div>
-              );
-            }
-            return null;
-          })}
-        </AnimatePresence>
-        {filteredFeed.length === 0 && (
-          <div className="bg-card border border-border-subtle rounded-card p-5 text-center text-sm text-muted">
-            No requests matched your search and filters.
+              </article>
+            ))}
           </div>
-        )}
-      </div>
+        </div>
+
+        <aside className="lg:col-span-4 rounded-3xl border border-border-subtle bg-card p-4 md:p-5">
+          <h3 className="text-sm font-bold uppercase tracking-wider text-muted">Discover Helpers</h3>
+          <div className="mt-3 space-y-2">
+            {users.slice(1, 9).map((user) => (
+              <Link key={user.id} href={`/profile/${user.username}`} className="flex items-center gap-3 rounded-xl border border-border-subtle bg-background p-2.5">
+                <div className="w-10 h-10 rounded-full border border-border-subtle bg-card flex items-center justify-center">{user.avatarChar}</div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold text-text truncate">{user.name}</p>
+                  <p className="text-[11px] font-mono text-muted truncate">@{user.username}</p>
+                </div>
+                <Sparkles className="w-4 h-4 text-primary" />
+              </Link>
+            ))}
+          </div>
+        </aside>
+      </section>
     </div>
   );
 }
