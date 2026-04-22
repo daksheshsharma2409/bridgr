@@ -8,6 +8,7 @@ export function ThreeBackground() {
 
     useEffect(() => {
         if (!containerRef.current) return;
+        const containerEl = containerRef.current;
 
         // Scene setup
         const scene = new THREE.Scene();
@@ -24,11 +25,11 @@ export function ThreeBackground() {
 
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setClearColor(0xfdfbf7, 0.1);
-        containerRef.current.appendChild(renderer.domElement);
+        containerEl.appendChild(renderer.domElement);
 
         camera.position.z = 5;
 
-        // Create floating geometric shapes with hand-drawn aesthetic
+        // Create subtle floating geometry for minimal ambience
         const geometries = [
             new THREE.IcosahedronGeometry(0.5, 4),
             new THREE.TetrahedronGeometry(0.6),
@@ -42,7 +43,7 @@ export function ThreeBackground() {
             vz: number;
         }[] = [];
 
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 3; i++) {
             const geometry =
                 geometries[Math.floor(Math.random() * geometries.length)];
             const material = new THREE.MeshPhongMaterial({
@@ -50,14 +51,14 @@ export function ThreeBackground() {
                 emissive: Math.random() > 0.7 ? 0xff4d4d : 0x2d2d2d,
                 emissiveIntensity: 0.2,
                 wireframe: Math.random() > 0.5,
-                opacity: 0.3,
+                opacity: 0.18,
                 transparent: true,
             });
 
             const mesh = new THREE.Mesh(geometry, material);
             mesh.position.set(
-                (Math.random() - 0.5) * 12,
-                (Math.random() - 0.5) * 10,
+                (Math.random() - 0.5) * 11,
+                (Math.random() - 0.5) * 9,
                 (Math.random() - 0.5) * 8,
             );
 
@@ -71,9 +72,9 @@ export function ThreeBackground() {
 
             shapes.push({
                 mesh,
-                vx: (Math.random() - 0.5) * 0.01,
-                vy: (Math.random() - 0.5) * 0.01,
-                vz: (Math.random() - 0.5) * 0.01,
+                vx: (Math.random() - 0.5) * 0.004,
+                vy: (Math.random() - 0.5) * 0.004,
+                vz: (Math.random() - 0.5) * 0.004,
             });
         }
 
@@ -83,7 +84,8 @@ export function ThreeBackground() {
 
         const pointLight = new THREE.PointLight(0xff4d4d, 1);
         pointLight.position.set(5, 5, 5);
-        scene.add(pointLight);
+            pointLight.intensity = 0.8;
+            scene.add(pointLight);
 
         // Mouse tracking
         let mouseX = 0;
@@ -113,13 +115,13 @@ export function ThreeBackground() {
                 if (shape.mesh.position.z > 4) shape.vz = -Math.abs(shape.vz);
                 if (shape.mesh.position.z < -4) shape.vz = Math.abs(shape.vz);
 
-                shape.mesh.rotation.x += 0.0005;
-                shape.mesh.rotation.y += 0.0008;
+                shape.mesh.rotation.x += 0.0003;
+                shape.mesh.rotation.y += 0.00045;
             });
 
             // Camera follows mouse slightly
-            camera.position.x = mouseX * 0.5;
-            camera.position.y = mouseY * 0.5;
+            camera.position.x = mouseX * 0.3;
+            camera.position.y = mouseY * 0.3;
             camera.lookAt(0, 0, 0);
 
             renderer.render(scene, camera);
@@ -139,7 +141,7 @@ export function ThreeBackground() {
         return () => {
             window.removeEventListener("mousemove", onMouseMove);
             window.removeEventListener("resize", onWindowResize);
-            containerRef.current?.removeChild(renderer.domElement);
+            containerEl.removeChild(renderer.domElement);
             geometries.forEach((g) => g.dispose());
         };
     }, []);

@@ -39,17 +39,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 onClose={() => setMenuOpen(false)}
             />
 
-            <header className="hidden md:flex fixed top-0 left-0 w-full h-24 px-6 md:px-12 bg-transparent z-[50] items-center justify-between">
-                <Link href="/" className="group">
-                    <h1 className="font-heading text-4xl md:text-6xl font-black text-text uppercase tracking-tighter hover:rotate-1 transition-transform duration-100">
+            <header className="hidden md:flex fixed top-0 left-0 w-full h-28 px-6 md:px-10 lg:px-14 bg-transparent z-[50] items-center justify-between">
+                <Link href="/" className="group bento-panel px-5 py-2 bg-card/90">
+                    <h1 className="font-heading text-3xl md:text-5xl font-black text-text uppercase tracking-tight transition-transform duration-150 group-hover:-translate-y-0.5">
                         BRIDGR
                     </h1>
                 </Link>
-                <div className="flex items-center gap-4 md:gap-6">
+                <div className="flex items-center gap-4 md:gap-5">
                     <KarmaCounter karma={currentUser.karma} />
                     <button
                         onClick={() => setMenuOpen(true)}
-                        className="hidden md:flex group flex-col gap-3 p-3 hover:bg-muted/30 rounded-full transition-colors cursor-pointer"
+                        className="hidden md:flex group flex-col gap-2.5 p-3.5 border-[2px] border-border bg-card/90 transition-all duration-150 cursor-pointer hover:-translate-y-0.5"
                         style={{
                             borderRadius:
                                 "255px 15px 225px 15px / 15px 225px 15px 255px",
@@ -62,17 +62,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </div>
             </header>
 
-            <main className="flex-1 pt-4 md:pt-32 pb-20 md:pb-12 px-3 md:px-6 lg:px-12 max-w-7xl mx-auto w-full z-10">
+            <main className="flex-1 pt-4 md:pt-36 pb-24 md:pb-14 px-4 md:px-8 lg:px-12 max-w-[86rem] mx-auto w-full z-10">
                 {children}
             </main>
 
-            {/* Mobile Bottom Dock - Hand-Drawn Style */}
             <nav
-                className="md:hidden fixed bottom-4 left-4 right-4 bg-card border-[3px] border-border py-3 px-2 z-[999] flex justify-center"
+                className="md:hidden fixed bottom-4 left-4 right-4 bg-card/95 border-[2px] border-border py-3 px-2 z-[999] flex justify-center backdrop-blur"
                 style={{
                     borderRadius:
                         "255px 15px 225px 15px / 15px 225px 15px 255px",
-                    boxShadow: "4px 4px 0px 0px #2d2d2d",
+                    boxShadow: "2px 2px 0px 0px #2d2d2d",
                 }}
             >
                 <div className="grid grid-cols-5 gap-2 max-w-md mx-auto">

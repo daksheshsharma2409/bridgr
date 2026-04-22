@@ -36,6 +36,7 @@
 
 @theme inline {
     --color-primary: var(--bridgr-primary);
+    --color-secondary: var(--bridgr-secondary);
     --color-karma: var(--bridgr-karma);
     --color-online: var(--bridgr-online);
     --color-quest: var(--bridgr-quest);
@@ -45,6 +46,7 @@
     --color-card: var(--bridgr-card);
     --color-text: var(--bridgr-text);
     --color-muted: var(--bridgr-muted);
+    --color-border: var(--bridgr-border);
     --color-border-subtle: var(--bridgr-border);
 
     --font-sans: var(--font-patrick-hand);
@@ -133,6 +135,16 @@ body {
 /* Minimalistic card styling */
 .card-minimal {
     @apply bg-card border-[2px] border-border p-6 md:p-8 lg:p-10;
+    border-radius: var(--radius-card);
+    box-shadow: 2px 2px 0px 0px #2d2d2d;
+}
+
+.bento-grid {
+    @apply grid grid-cols-1 gap-4 md:gap-6 lg:gap-8;
+}
+
+.bento-panel {
+    @apply bg-card border-[2px] border-border;
     border-radius: var(--radius-card);
     box-shadow: 2px 2px 0px 0px #2d2d2d;
 }

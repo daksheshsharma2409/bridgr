@@ -1,16 +1,21 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { SignalBadge } from "@/components/ui/SignalBadge";
 import { MessageSquare, Search, Sparkles, Terminal } from "lucide-react";
 import { useMockData } from "@/lib/MockDataContext";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export default function Lobby() {
     const { feed, users, addFeedItem, offerHelp, currentUser } = useMockData();
     const [newPost, setNewPost] = useState("");
     const [activeFilter, setActiveFilter] = useState("All");
     const [searchTerm, setSearchTerm] = useState("");
+    const heroRef = useRef<HTMLDivElement>(null);
+    const feedRef = useRef<HTMLDivElement>(null);
+    const asideRef = useRef<HTMLElement>(null);
 
     const handlePost = (e: React.FormEvent) => {
         e.preventDefault();
@@ -52,14 +57,61 @@ export default function Lobby() {
         });
     }, [activeFilter, feed, searchTerm]);
 
+    useEffect(() => {
+        gsap.registerPlugin(ScrollTrigger);
+        const ctx = gsap.context(() => {
+            gsap.from(".lobby-panel", {
+                y: 28,
+                opacity: 0,
+                duration: 0.7,
+                ease: "power2.out",
+                stagger: 0.14,
+            });
+
+            gsap.utils.toArray<HTMLElement>(".scroll-reveal").forEach((el) => {
+                gsap.fromTo(
+                    el,
+                    { y: 32, opacity: 0.15 },
+                    {
+                        y: 0,
+                        opacity: 1,
+                        duration: 0.65,
+                        ease: "power2.out",
+                        scrollTrigger: {
+                            trigger: el,
+                            start: "top 88%",
+                            end: "top 55%",
+                            scrub: 0.7,
+                        },
+                    },
+                );
+            });
+
+            if (heroRef.current) {
+                gsap.to(heroRef.current, {
+                    yPercent: -8,
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: heroRef.current,
+                        start: "top top",
+                        end: "bottom top",
+                        scrub: true,
+                    },
+                });
+            }
+        });
+
+        return () => ctx.revert();
+    }, [filteredFeed.length]);
+
     return (
-        <div className="max-w-5xl mx-auto pb-8 space-y-4 md:space-y-6">
+        <div className="max-w-6xl mx-auto pb-10 space-y-6 md:space-y-8">
             <section
-                className="bg-card border-[3px] border-border p-5 md:p-6"
+                ref={heroRef}
+                className="lobby-panel bento-panel p-6 md:p-8 lg:p-10"
                 style={{
                     borderRadius:
                         "200px 30px 210px 20px / 20px 210px 30px 200px",
-                    boxShadow: "4px 4px 0px 0px #2d2d2d",
                 }}
             >
                 <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
@@ -85,7 +137,7 @@ export default function Lobby() {
                         </span>
                     </div>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-5">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-7">
                     <button
                         onClick={() => {
                             addFeedItem({
@@ -136,14 +188,10 @@ export default function Lobby() {
                 </div>
             </section>
 
-            <section className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            <section className="bento-grid lg:grid-cols-12">
                 <div
-                    className="lg:col-span-8 bg-card border-[3px] border-border p-4 md:p-5"
-                    style={{
-                        borderRadius:
-                            "200px 30px 210px 20px / 20px 210px 30px 200px",
-                        boxShadow: "4px 4px 0px 0px #2d2d2d",
-                    }}
+                    ref={feedRef}
+                    className="lobby-panel lg:col-span-8 bento-panel p-5 md:p-7 lg:p-8"
                 >
                     <div
                         className="flex items-center gap-2 bg-muted/20 border-[2px] border-border px-3 py-2"
@@ -201,13 +249,13 @@ export default function Lobby() {
                         </button>
                     </form>
 
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                         {filteredFeed
                             .filter((item) => item.type === "request")
                             .map((item) => (
                                 <article
                                     key={item.id}
-                                    className="bg-muted/20 border-[2px] border-border p-4"
+                                    className="scroll-reveal bg-muted/20 border-[2px] border-border p-4 md:p-5"
                                     style={{
                                         borderRadius:
                                             "200px 30px 210px 20px / 20px 210px 30px 200px",
@@ -290,12 +338,8 @@ export default function Lobby() {
                 </div>
 
                 <aside
-                    className="lg:col-span-4 bg-card border-[3px] border-border p-5"
-                    style={{
-                        borderRadius:
-                            "200px 30px 210px 20px / 20px 210px 30px 200px",
-                        boxShadow: "4px 4px 0px 0px #2d2d2d",
-                    }}
+                    ref={asideRef}
+                    className="lobby-panel lg:col-span-4 bento-panel p-5 md:p-6"
                 >
                     <h3 className="text-sm font-heading font-bold uppercase tracking-wider text-text">
                         Discover Helpers
@@ -305,7 +349,7 @@ export default function Lobby() {
                             <Link
                                 key={user.id}
                                 href={`/profile/${user.username}`}
-                                className="flex items-center gap-3 bg-muted/20 border-[2px] border-border p-3 transition-all duration-100 hover:translate-x-1 hover:translate-y-1"
+                                className="scroll-reveal flex items-center gap-3 bg-muted/20 border-[2px] border-border p-3.5 transition-all duration-150 hover:-translate-y-0.5"
                                 style={{
                                     borderRadius:
                                         "200px 30px 210px 20px / 20px 210px 30px 200px",
